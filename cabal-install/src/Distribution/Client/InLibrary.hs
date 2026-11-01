@@ -24,6 +24,7 @@ import qualified Distribution.Client.SetupHooks.CallHooksExe as ExternalHooksExe
 import Distribution.Client.Types
 
 import qualified Distribution.PackageDescription as PD
+import Distribution.Pretty (prettyShow)
 import Distribution.Simple (Compiler, PackageDBStackCWD)
 import qualified Distribution.Simple.Bench as Cabal
 import Distribution.Simple.Build (build_setupHooks, repl_setupHooks)
@@ -129,7 +130,14 @@ libraryConfigureInputsFromElabPackage
       }
     where
       pkgDescr = elabPkgDescription pkg
-      gpkgDescr = pkgSourceGPkgDescription (sources Map.! elabPkgSourceId pkg)
+      -- elaborateInstallPlan records every configured solver package under its
+      -- PackageId; components and Backpack instantiations retain that source id.
+      gpkgDescr = case Map.lookup (elabPkgSourceId pkg) sources of
+        Just source -> pkgSourceGPkgDescription source
+        Nothing ->
+          error $
+            "libraryConfigureInputsFromElabPackage: shared config has no source for "
+              ++ prettyShow (elabPkgSourceId pkg)
 
 configure
   :: LibraryConfigureInputs

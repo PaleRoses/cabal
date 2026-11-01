@@ -204,7 +204,9 @@ instance Structured ElaboratedSharedConfig
 -- | Source information shared by all components and instantiations of a package.
 data ElaboratedPackageSource = ElaboratedPackageSource
   { pkgSourceGPkgDescription :: Cabal.GenericPackageDescription
-  -- ^ Original description, used to report errors and warnings during configure.
+  -- ^ The generic description the package was solved with, including any
+  -- rewrites made before solving. The in-library configure reads it for
+  -- internal libraries and package checks.
   }
   deriving (Show, Generic)
 
